@@ -214,6 +214,13 @@ def define_classes():
                     else:
                         self.save_position()
                 
+                # Use manual overrides (if present)
+                if self.config.get('override_position_y', None) is not None:
+                    y = self.config.get('override_position_y')
+                
+                if self.config.get('override_position_x', None) is not None:
+                    x = self.config.get('override_position_x')
+                
                 self.move(x, y)
                 self.taskbar_y = y
                 self.logger.debug(f"Positioned widget at: x={x}, y={y}")
@@ -258,6 +265,13 @@ def define_classes():
                 else:
                     x = taskbar_rect[2] - self.width() - 5  # Fallback to right edge
                 y = taskbar_rect[1]  # Always top of taskbar
+                
+                # Use manual overrides (if present)
+                if self.config.get('override_position_y', None) is not None:
+                    y = self.config.get('override_position_y')
+                
+                if self.config.get('override_position_x', None) is not None:
+                    x = self.config.get('override_position_x')
                 
                 current_pos = self.pos()
                 if current_pos.x() != x or current_pos.y() != y:
@@ -319,6 +333,10 @@ def define_classes():
                 return QApplication.primaryScreen(), self.taskbar_hwnd
 
         def get_taskbar_height(self):
+            # Use manual override (if present)
+            if self.config.get('override_taskbar_height', None) is not None:
+                return self.config.get('override_taskbar_height')
+            
             if self.taskbar_hwnd:
                 rect = win32gui.GetWindowRect(self.taskbar_hwnd)
                 height = rect[3] - rect[1]  # Physical height
