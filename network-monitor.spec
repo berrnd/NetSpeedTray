@@ -43,6 +43,4 @@ exe = EXE(
     upx=False,
     console=False,
     disable_windowed_traceback=False,
-    icon='NetSpeedTray.ico',
-    version='version_info.txt',
 )
