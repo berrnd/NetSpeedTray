@@ -52,7 +52,7 @@ if not exist "NetSpeedTray.py" (echo ERROR: NetSpeedTray.py missing & exit /b 1)
 rem if not exist "NetSpeedTray.ico" (echo ERROR: NetSpeedTray.ico missing & exit /b 1)
 rem if not exist "netspeedtray.spec" (echo ERROR: netspeedtray.spec missing & exit /b 1)
 rem if not exist "installer.iss" (echo ERROR: installer.iss missing & exit /b 1)
-if not exist "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" (echo ERROR: Inno Setup 6 not installed & exit /b 1)
+rem if not exist "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" (echo ERROR: Inno Setup 6 not installed & exit /b 1)
 if not exist "C:\Program Files\7-Zip\7z.exe" (echo ERROR: 7-Zip not installed & exit /b 1)
 set "end_time=%TIME%"
 call :time_diff "%start_time%" "%end_time%"
@@ -74,12 +74,13 @@ echo Cleaning build artifacts completed in !elapsed!
 rem Stage 3: Compile Executable
 echo Compiling executable...
 set "start_time=%TIME%"
-python -m PyInstaller network-monitor.spec >nul 2>nul
+python -m PyInstaller network-monitor.spec
 if errorlevel 1 (echo ERROR: PyInstaller failed & exit /b 1)
 if not exist "dist\NetSpeedTray.exe" (echo ERROR: Executable not found after compilation & exit /b 1)
 set "end_time=%TIME%"
 call :time_diff "%start_time%" "%end_time%"
 echo Compiling executable completed in !elapsed!
+goto :eof
 
 rem Stage 4: Package Portable
 echo Packaging portable version...

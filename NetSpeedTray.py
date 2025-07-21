@@ -349,6 +349,7 @@ def define_classes():
             return 40
 
         def mousePressEvent(self, event) -> None:
+            return # Disable dragging
             if event.button() == Qt.MouseButton.LeftButton:
                 self.dragging = True
                 self.offset = event.position().toPoint()
@@ -651,22 +652,36 @@ def define_classes():
 
         def format_speed(self, bytes_per_sec: float) -> str:
             """Format network speed."""
-            if self.config.get('use_megabytes', False):
-                bytes_val = bytes_per_sec / 1000000
-                if bytes_val >= 1000:
-                    return f"{bytes_val / 1000:5.1f} GB/s"
-                elif bytes_val >= 1:
-                    return f"{bytes_val:5.1f} MB/s"
-                else:
-                    return f"{bytes_val * 1000:5.1f} KB/s"
+            #if self.config.get('use_megabytes', False):
+            #    bytes_val = bytes_per_sec / 1000000
+            #    if bytes_val >= 1000:
+            #        return f"{bytes_val / 1000:5.1f} GB/s"
+            #    elif bytes_val >= 1:
+            #        return f"{bytes_val:5.1f} MB/s"
+            #    else:
+            #        return f"{bytes_val * 1000:5.1f} KB/s"
+            #else:
+            #    bits_per_sec = bytes_per_sec * 8
+            #    if bits_per_sec >= 1000000:
+            #        return f"{bits_per_sec / 1000000:5.1f} Mb/s"
+            #    elif bits_per_sec >= 1000:
+            #        return f"{bits_per_sec / 1000:5.1f} Kb/s"
+            #    else:
+            #        return f"{bits_per_sec:5.0f} b/s"
+            
+            bits_per_sec = bytes_per_sec * 8
+            mbits = bits_per_sec / 1000000
+            padding = self.config.get('override_rjust_characters', 0)
+            if padding != 0:
+                if mbits >= 10:
+                    padding -= 1
+                
+                if mbits >= 100:
+                    padding -= 1
+                
+                return f"{mbits:5.2f}".rjust(padding, ' ').replace(".", ",")[padding * -1:]
             else:
-                bits_per_sec = bytes_per_sec * 8
-                if bits_per_sec >= 1000000:
-                    return f"{bits_per_sec / 1000000:5.1f} Mb/s"
-                elif bits_per_sec >= 1000:
-                    return f"{bits_per_sec / 1000:5.1f} Kb/s"
-                else:
-                    return f"{bits_per_sec:5.0f} b/s"
+                return f"{mbits:5.2f}".replace(".", ",")
 
         def get_speed_color(self, speed: float) -> QColor:
             if not self.config.get('color_coding', False):
@@ -952,7 +967,7 @@ def define_classes():
         DEFAULT_CONFIG = {
             'color_coding': False, 'high_speed_threshold': 5.0, 'low_speed_threshold': 1.0,
             'high_speed_color': '#00FF00', 'low_speed_color': '#FFA500', 'default_color': '#FFFFFF',
-            'graph_enabled': True,
+            'graph_enabled': False,
             'history_minutes': 30, 'update_rate': DEFAULT_UPDATE_RATE,
             'position_x': None, 'position_y': None, 'start_with_windows': False,
             'interface_mode': 'all', 'selected_interfaces': [], 'graph_opacity': 30,
@@ -960,7 +975,11 @@ def define_classes():
             'smart_threshold': 100000,
             'history_period': 'System Uptime',
             'dark_mode': False, 'legend_position': 'off',
-            'font_size': DEFAULT_FONT_SIZE, 'font_weight': 4
+            'font_size': DEFAULT_FONT_SIZE, 'font_weight': 4,
+            'override_position_x': 0,
+            'override_position_y': 750,
+            'override_taskbar_height': 40,
+            'override_rjust_characters': 0,
         }
 
         def get_app_data_path(self) -> str:
@@ -1616,7 +1635,11 @@ def define_classes():
                     'history_period': self.parent_widget.config.get('history_period', 'System Uptime'),
                     'dark_mode': self.parent_widget.config.get('dark_mode', False),
                     'font_size': self.font_size.value(),
-                    'font_weight': self.font_weight.value()
+                    'font_weight': self.font_weight.value(),
+                    'override_position_x': self.parent_widget.config.get('override_position_x', 0),
+                    'override_position_y': self.parent_widget.config.get('override_position_y', 750),
+                    'override_taskbar_height': self.parent_widget.config.get('override_taskbar_height', 40),
+                    'override_rjust_characters': self.parent_widget.config.get('override_rjust_characters', 0),
                 }
                 if settings['start_with_windows'] != self.parent_widget.is_startup_enabled():
                     self.parent_widget.toggle_startup(settings['start_with_windows'])
